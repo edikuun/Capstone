@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<emitter imageName="" name="Leave Particle">
+	<spawnIntervall enabled="false" min="1000" max="1000"/>
+	<spawnCount enabled="true" max="10.0" min="10.0"/>
+	<initialLife enabled="true" max="2000.0" min="2000.0"/>
+	<initialSize enabled="true" max="20" min="18"/>
+	<speed enabled="true" max="40" min="20.0"/>
+  	<startAlpha value="255.0"/>
+  	<endAlpha value="10.0"/>
+  	<growthFactor enabled="false" value="1"/>
+  	<color>
+		<step r="0.047" offset="0.0" g="0.929" b="0.886"/>
+		<step r="0.16" offset="1.0" g="0.78" b="0.003"/>
+  	</color>
+</emitter>
