@@ -42,8 +42,8 @@ public class HighscoreState extends BasicGameState{
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
 		this.game = game;
-		font = new TrueTypeFont(new java.awt.Font("verdana", java.awt.Font.BOLD, 20), true);
-		fontHeader = new TrueTypeFont(new java.awt.Font("verdana", java.awt.Font.BOLD, 45), true);
+		font = new TrueTypeFont(new java.awt.Font("consola", java.awt.Font.BOLD, 20), true);
+		fontHeader = new TrueTypeFont(new java.awt.Font("consola", java.awt.Font.BOLD, 45), true);
 		
 		highscore = Highscore.load(Highscore.standardFileName);
 		if(highscore==null){
@@ -53,7 +53,7 @@ public class HighscoreState extends BasicGameState{
 		bufferImg = new Image(container.getWidth(), container.getHeight());
 		imgGraphics = bufferImg.getGraphics();
 		
-		overlay = new GradientFill(0,1, Color.red, 1, 0, Color.orange.darker(0.25f));
+		overlay = new GradientFill(0,1, Color.blue, 1, 0, Color.red.darker(0.25f));
 		overlay.setLocal(false);
 		
 		calcFillingRect(container);
@@ -78,13 +78,13 @@ public class HighscoreState extends BasicGameState{
 			if(i==highlight){
 				s = "> " + s + " <";
 			}
-			font.drawString(x-font.getWidth(s)/2,y+i*font.getLineHeight(), s, /*i==highlight?highlightColor:*/normalColor);
+			font.drawString(x-font.getWidth(s)/2,y+i*font.getLineHeight(), s, normalColor);
 		}
 		
 		int hx = (container.getWidth()-fontHeader.getWidth(headerText))/2;
-		fontHeader.drawString(hx, y /2/*- fontHeader.getLineHeight() - 15*/, headerText);
+		fontHeader.drawString(hx, y /2, headerText);
 		
-		imgGraphics.setDrawMode(Graphics.MODE_COLOR_MULTIPLY);
+		imgGraphics.setDrawMode(Graphics.MODE_ALPHA_BLEND);
 		imgGraphics.fill(fillingRect, overlay);
 		
 		imgGraphics.flush();
@@ -92,11 +92,7 @@ public class HighscoreState extends BasicGameState{
 		Graphics.setCurrent(g);
 		bufferImg.draw();
 		
-		//DEBUG: Show gradient start and end point
-//		g.setColor(Color.green);
-//		g.fillRect(overlay.getStart().x -5, overlay.getStart().y -5, 10, 10);
-//		g.setColor(Color.blue);
-//		g.fillRect(overlay.getEnd().x -5, overlay.getEnd().y -5, 10, 10);
+
 	}
 	
 	private void calcFillingRect(GameContainer container){
@@ -135,31 +131,11 @@ public class HighscoreState extends BasicGameState{
 		Vector2f start = overlay.getStart();
 		Vector2f end = overlay.getEnd();
 		
-//		float dx = delta * xpms;
-//		float dy = m * dx;
+
 		
 		float dy = delta * ypms;
 		
-////		
-////		start.x += dx;
-////		start.y -= dy;
-////		
-////		if(start.x > fillingRect.getMaxX()){
-////			start.x -= fillingRect.getWidth();
-////			start.y += fillingRect.getHeight();
-////		}
-////		
-//		end.x += dx;
-//		end.y -= dy;
-//		
-//		if(end.x > fillingRect.getMaxX()){
-////			end.x -= fillingRect.getWidth();
-////			end.y += fillingRect.getHeight();
-//			xpms *= -1;
-//		}
-//		else if(end.x < fillingRect.getMinX()){
-//			xpms *= -1;
-//		}
+
 		
 		start.y += dy * startFac;
 		end.y += dy*endFac;

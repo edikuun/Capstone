@@ -37,6 +37,10 @@ public class Player implements KeyListener {
 
     private static final int SITTINGOFFSET = 20;
 
+    private boolean pressedLeft = false;
+    private boolean pressedRight = false;
+    private boolean pressedJump = false;
+
     public void init(GameContainer container, StateBasedGame game, InGameState state) {
         container.getInput().addKeyListener(this);
         gameState = state;
@@ -44,12 +48,12 @@ public class Player implements KeyListener {
 
         SpriteSheet sheet = SpritesheetLoader.getInstance().getSpriteSheet("misc", 64, 64);
         SpriteSheet haramstand = SpritesheetLoader.getInstance().getSpriteSheet("stand", 53, 73);
-        SpriteSheet haramjumpright = SpritesheetLoader.getInstance().getSpriteSheet("jump", 55, 73);
-        SpriteSheet haramjumpleft = SpritesheetLoader.getInstance().getSpriteSheet("jump2", 73, 73);
+        SpriteSheet haramjumpright = SpritesheetLoader.getInstance().getSpriteSheet("haramboyJumpRight", 64, 64);
+        SpriteSheet haramjumpleft = SpritesheetLoader.getInstance().getSpriteSheet("haramboyJumpLeft", 64, 64);
         SpriteSheet dead = SpritesheetLoader.getInstance().getSpriteSheet("dead", 75, 75);
-        spriteStanding = haramstand.getSprite(0, 0).getSubImage(0, 0, 53, 73);
-        spriteJumpingRight = haramjumpright.getSprite(0, 0).getSubImage(0, 0, 55, 73);
-        spriteJumpingLeft = haramjumpleft.getSprite(0, 0).getSubImage(0, 0, 73, 73);
+        spriteStanding = haramjumpright.getSprite(0, 0).getSubImage(0, 0, 60, 50);
+        spriteJumpingRight = haramjumpright.getSprite(1, 0).getSubImage(0, 0, 64, 50);
+        spriteJumpingLeft = haramjumpleft.getSprite(1, 0).getSubImage(0, 0, 64, 50);
         spriteSitting = haramstand.getSprite(0, 0).getSubImage(0, 0, 53, 73);
         spriteDead = dead.getSprite(0, 0).getSubImage(0, 0, 75, 75);
 
@@ -59,9 +63,15 @@ public class Player implements KeyListener {
 
     public void update(GameContainer container, StateBasedGame game, int delta) {
         if (ySpeed <= 5 * maxSpeed / 6f && ySpeed > 0 && alive) {
-            setCurrentSprite(spriteJumpingRight);
+            if (pressedLeft) {
+                setCurrentSprite(spriteJumpingLeft);
+                pressedLeft = false;
+            }
+            if (pressedRight) {
+                setCurrentSprite(spriteJumpingRight);
+                pressedRight = false;
+            }
         }
-
 
         applySpriteCollision();
 
@@ -75,7 +85,7 @@ public class Player implements KeyListener {
                     x = container.getWidth() - 120;
                 }
                 x += xSpeed;
-               
+
                 applyCollision();
                 checkDeath();
             } else {
@@ -92,7 +102,14 @@ public class Player implements KeyListener {
                     jumpCounter = 0;
                     ySpeed = maxSpeed;
                     onPlatform = false;
-                    setCurrentSprite(spriteStanding);
+                    if (pressedLeft) {
+                        setCurrentSprite(spriteJumpingLeft);
+                        pressedLeft = false;
+                    }
+                    if (pressedRight) {
+                        setCurrentSprite(spriteJumpingRight);
+                        pressedRight = false;
+                    }
                     score++;
                 }
             }
@@ -185,13 +202,17 @@ public class Player implements KeyListener {
 
     }
 
+    public Image getSpriteNew() {
+        return spriteStanding;
+    }
+
     public Rectangle getBounds() {
         bounds.setX(x);
         bounds.setY(y);
         bounds.setWidth(spriteStanding.getWidth() * gameState.getTextureScaling());
         bounds.setHeight(spriteStanding.getHeight() * gameState.getTextureScaling());
         return bounds;
-     
+
     }
 
     private float getScaling() {
@@ -207,10 +228,8 @@ public class Player implements KeyListener {
         rx -= (currentSprite.getWidth() * getScaling() - drawBounds.getWidth()) / 2;
         ry -= (currentSprite.getHeight() * getScaling() - drawBounds.getHeight()) / 2;
 
-
         currentSprite.draw(rx, ry, gameState.getTextureScaling());
 
-   
     }
 
     @Override
@@ -235,9 +254,11 @@ public class Player implements KeyListener {
 
     @Override
     public void keyPressed(int key, char c) {
-      if (Input.KEY_RIGHT == key) {
+        if (Input.KEY_RIGHT == key) {
+            pressedRight = true;
             xSpeed = constantXSpeed;
         } else if (Input.KEY_LEFT == key) {
+            pressedLeft = true;
             xSpeed = -constantXSpeed;
         } else if (Input.KEY_SPACE == key && onPlatform) {
             setCurrentSprite(spriteStanding);
@@ -255,7 +276,7 @@ public class Player implements KeyListener {
 
     @Override
     public void keyReleased(int key, char c) {
-      if ((Input.KEY_RIGHT == key && xSpeed == constantXSpeed)
+        if ((Input.KEY_RIGHT == key && xSpeed == constantXSpeed)
                 || (Input.KEY_LEFT == key && xSpeed == -constantXSpeed)) {
             xSpeed = 0;
             if (container.getInput().isKeyDown(Input.KEY_LEFT)) {

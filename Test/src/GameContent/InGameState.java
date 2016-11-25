@@ -30,6 +30,8 @@ import GameOver.GameOverState_Counter;
 import ImageLoaders.ImageLoader;
 import ImageLoaders.SpritesheetLoader;
 import Transitions.FixedAlphaFadingTransition;
+import org.newdawn.slick.Music;
+import org.newdawn.slick.Sound;
 
 public class InGameState extends BasicGameState {
 
@@ -52,6 +54,8 @@ public class InGameState extends BasicGameState {
     private MainGame game;
     private Image bg;
     private Audio music;
+    private Music music2;
+    private Sound music3;
 
     private LinkedList<Integer[]> placesInDebugToClear = new LinkedList<Integer[]>();
 
@@ -71,11 +75,13 @@ public class InGameState extends BasicGameState {
         Graphics.setCurrent(g);
         bg = ImageLoader.getInstance().getImage("spritesheet_bg");
         g.drawImage(bg, 0, 0);
-        /*try {
-            music = AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("Images\\15_-_Classic_-_MKTO.ogg"));
+        try {
+            music = AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("Images\\39 - Best Day of My Life - American Authors.ogg"));
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
+        music2 = new Music("Images\\39 - Best Day of My Life - American Authors.ogg");
+        music3 = new Sound("Images\\39 - Best Day of My Life - American Authors.ogg");
         g.fillRect(0, 0, image.getWidth(), image.getHeight());
         g.flush();
         system = new ParticleSystem(image);
@@ -115,9 +121,7 @@ public class InGameState extends BasicGameState {
     public void update(GameContainer container, StateBasedGame game, int delta)
             throws SlickException {
         system.update(delta);
-        //music.playAsSoundEffect(1.0f, 1.0f, false);
-        //SoundStore.get().poll(0);
-
+        
 
         for (Platform p : platformsToRemove) {
             platforms.remove(p);
@@ -180,6 +184,7 @@ public class InGameState extends BasicGameState {
         cameraHeight = 0f;
         platforms.clear();
         player.setScore(0);
+        player.setCurrentSprite(player.getSpriteNew());
 
         Image base = sheet.getSprite(0, 0).getSubImage(0, 0, 62, 15);
         Image flipped = base.getFlippedCopy(true, false);
@@ -187,7 +192,7 @@ public class InGameState extends BasicGameState {
         for (int i = 0;; i++) {
             platforms.addLast(new Platform(new Rectangle(i * 64 * textureScaling, 12 * textureScaling, 64 * textureScaling, 12 * textureScaling),
                     flip ? flipped : base, this));
-           system.addEmitter(platforms.getLast()); // TO BE REMOVED
+            system.addEmitter(platforms.getLast()); // TO BE REMOVED
             if ((i + 1) * 64 * textureScaling > gameScreenBoundings.getWidth()) {
                 break;
             }
@@ -282,6 +287,7 @@ public class InGameState extends BasicGameState {
     public void enter(GameContainer container, StateBasedGame game) throws SlickException {
         placesInDebugToClear.clear();
         DebugInfo info = this.game.getDebugInfo();
+        music2.play();
 
         try {
             Integer[] coordsForPlatCount = info.getFirstFree();
