@@ -289,7 +289,7 @@ public class InGameState extends BasicGameState {
         DebugInfo info = this.game.getDebugInfo();
         music2.play();
 
-        try {
+       /* try {
             Integer[] coordsForPlatCount = info.getFirstFree();
             info.set(coordsForPlatCount[0], coordsForPlatCount[1], new Object[]{"Platform: ", new Object[]{InGameState.class.getMethod("getPlatformCount"), this}});
 
@@ -305,7 +305,7 @@ public class InGameState extends BasicGameState {
             placesInDebugToClear.add(coordsForEmitterCount);
         } catch (NoSuchMethodException | SecurityException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     @Override

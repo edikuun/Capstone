@@ -29,12 +29,12 @@ public class PauseGameState extends BasicGameState{
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
-		font = new TrueTypeFont(new java.awt.Font("verdana", java.awt.Font.BOLD, 20), true);
+		font = new TrueTypeFont(new java.awt.Font("consola", java.awt.Font.BOLD, 20), true);
 		ingameState = game.getState(InGameState.ID);
 		this.game = game;
 	}
 
-	private static String[] text = new String[]{"- PAUSE -", "Game has been Paused"};
+	private static String[] text = new String[]{"-PAUSE-", "GAME HAS BEEN PAUSED"};
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
 			throws SlickException {
