@@ -12,211 +12,216 @@ import org.newdawn.slick.state.StateBasedGame;
 
 import ImageLoaders.SpritesheetLoader;
 
+public class MainMenuButton implements MouseListener {
 
-public class MainMenuButton implements MouseListener{
-	private MainMenu menu;
-	private String text, command;
-	private float xOffset, yOffset; //yOffset is at the top border, x Offset is in the middle of the button
-	private Rectangle bounds;
-	private Font font;
-	private Color colorNotHovered = Color.white, colorHovered = Color.red;
-	private MainMenuButton alignButton;
-	private boolean hovered = false;
-	
-	
-	
-	public MainMenuButton(MainMenu menu, String text, String command, float xOffset, float yOffset, GameContainer container){
-		this.menu = menu;
-		this.text = text;
-		this.command = command;
-		this.xOffset = xOffset;
-		this.yOffset = yOffset;
-		
-		font = new TrueTypeFont(new java.awt.Font("consola", java.awt.Font.BOLD, 20), true);
-		this.createBoundings();
-		
-		container.getInput().addMouseListener(this);	
-	}
-	
-	
-	public MainMenuButton(MainMenu menu, String text, String command,
-			MainMenuButton alignButton, float xOffset, float yOffset, GameContainer container){
-		
-		this(menu,text,command,xOffset,yOffset,container);
-		this.alignButton = alignButton;
-		createBoundings();
-	}
-	
-	
+    private MainMenu menu;
+    private String text, command;
+    private float xOffset, yOffset; //yOffset is at the top border, x Offset is in the middle of the button
+    private Rectangle bounds;
+    private Font font;
+    private Color colorNotHovered = Color.white, colorHovered = Color.yellow;
+    private MainMenuButton alignButton;
+    private boolean hovered = false;
 
-	public MainMenuButton(MainMenu menu, String text, String command,
-			MainMenuButton alignButton, float xOffset, float yOffset, Font font, GameContainer container){
-		this(menu,text,command,alignButton,xOffset,yOffset,container);
-		this.font = font;
-		createBoundings();
-	}
+    public MainMenuButton(MainMenu menu, String text, String command, float xOffset, float yOffset, GameContainer container) {
+        this.menu = menu;
+        this.text = text;
+        this.command = command;
+        this.xOffset = xOffset;
+        this.yOffset = yOffset;
 
-	//Generate this buttons boundings based on text size; offset and alignment
-	private void createBoundings(){
-		float midPosX = xOffset;
-		float posY = yOffset;
-		
-		if(alignButton != null){
-			midPosX+=alignButton.getBounds().getCenterX();
-			posY += alignButton.getBounds().getMaxY();
-		}
-		
-		int textWidth = font.getWidth(text);
-		int textHeight = font.getLineHeight();
-		
-		if(bounds == null) bounds = new Rectangle(0,0, 0, 0);
-		bounds.setWidth(textWidth);
-		bounds.setHeight(textHeight);
-		bounds.setCenterX(midPosX);
-		bounds.setY(posY);
-	}
-	
-	public void render(GameContainer container, StateBasedGame game, Graphics g){
+        font = new TrueTypeFont(new java.awt.Font("cooper black", java.awt.Font.BOLD, 30), true);
+        this.createBoundings();
+
+        container.getInput().addMouseListener(this);
+    }
+
+    public MainMenuButton(MainMenu menu, String text, String command,
+            MainMenuButton alignButton, float xOffset, float yOffset, GameContainer container) {
+
+        this(menu, text, command, xOffset, yOffset, container);
+        this.alignButton = alignButton;
+        createBoundings();
+    }
+
+    public MainMenuButton(MainMenu menu, String text, String command,
+            MainMenuButton alignButton, float xOffset, float yOffset, Font font, GameContainer container) {
+        this(menu, text, command, alignButton, xOffset, yOffset, container);
+        this.font = font;
+        createBoundings();
+    }
+
+    //Generate this buttons boundings based on text size; offset and alignment
+    private void createBoundings() {
+        float midPosX = xOffset;
+        float posY = yOffset;
+
+        if (alignButton != null) {
+            midPosX += alignButton.getBounds().getCenterX();
+            posY += alignButton.getBounds().getMaxY();
+        }
+
+        int textWidth = font.getWidth(text);
+        int textHeight = font.getLineHeight();
+
+        if (bounds == null) {
+            bounds = new Rectangle(0, 0, 0, 0);
+        }
+        bounds.setWidth(textWidth);
+        bounds.setHeight(textHeight);
+        bounds.setCenterX(midPosX);
+        bounds.setY(posY);
+    }
+
+    public void render(GameContainer container, StateBasedGame game, Graphics g) {
 //		if(hovered)
 //			hoverImage.draw(bounds.getX() - 2, bounds.getY() -2 , bounds.getWidth() + 4, bounds.getHeight() + 4); TO BE REMOVED
-		g.setFont(font);
-		g.setColor(hovered?colorHovered:colorNotHovered);
-		
-		g.drawString(text, bounds.getX(), bounds.getY());
-	}
-	
-	@Override
-	public void inputEnded() {
-		// TODO Auto-generated method stub
-		
-	}
+        g.setFont(font);
+        g.setColor(hovered ? colorHovered : colorNotHovered);
 
-	@Override
-	public void inputStarted() {
-		// TODO Auto-generated method stub
-		
-	}
+        g.drawString(text, bounds.getX(), bounds.getY());
+    }
 
-	@Override
-	public boolean isAcceptingInput() {
-		// TODO Auto-generated method stub
-		return menu.isAcceptingInput();
-	}
+    @Override
+    public void inputEnded() {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void setInput(Input input) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public void mouseClicked(int button, int x, int y, int clickCount) {
-		if(button == Input.MOUSE_LEFT_BUTTON && bounds.contains(x, y)){
-			menu.execute(command);
-		}		
-	}
+    @Override
+    public void inputStarted() {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void mouseDragged(int oldx, int oldy, int newx, int newy) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
-		
-	}
+    @Override
+    public boolean isAcceptingInput() {
+        // TODO Auto-generated method stub
+        return menu.isAcceptingInput();
+    }
 
-	@Override
-	public void mousePressed(int button, int x, int y) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void setInput(Input input) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void mouseReleased(int button, int x, int y) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public void mouseWheelMoved(int change) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void mouseClicked(int button, int x, int y, int clickCount) {
+        if (button == Input.MOUSE_LEFT_BUTTON && bounds.contains(x, y)) {
+            menu.execute(command);
+        }
+    }
 
-	
-	//Getters and Setters
-	public String getText() {
-		return text;
-	}
+    @Override
+    public void mouseDragged(int oldx, int oldy, int newx, int newy) {
+        // TODO Auto-generated method stub
 
-	public void setText(String text) {
-		this.text = text;
-		createBoundings();
-	}
+    }
 
-	public String getCommand() {
-		return command;
-	}
+    @Override
+    public void mouseMoved(int oldx, int oldy, int newx, int newy) {
+        if (bounds.contains(newx, newy)) {
+            setHovered(true);
+        } else {
+            setHovered(false);
+        }
 
-	public void setCommand(String command) {
-		this.command = command;
-	}
+    }
 
-	public float getxOffset() {
-		return xOffset;
-	}
+    @Override
+    public void mousePressed(int button, int x, int y) {
+        // TODO Auto-generated method stub
 
-	public void setxOffset(float xOffset) {
-		this.xOffset = xOffset;
-		createBoundings();
-	}
+    }
 
-	public float getyOffset() {
-		return yOffset;
-	}
+    @Override
+    public void mouseReleased(int button, int x, int y) {
+        // TODO Auto-generated method stub
 
-	public void setyOffset(float yOffset) {
-		this.yOffset = yOffset;
-		createBoundings();
-	}
+    }
 
-	public Font getFont() {
-		return font;
-	}
+    @Override
+    public void mouseWheelMoved(int change) {
+        // TODO Auto-generated method stub
 
-	public void setFont(Font font) {
-		this.font = font;
-		createBoundings();
-	}
+    }
 
-	public Color getColorNotHovered() {
-		return colorNotHovered;
-	}
+    //Getters and Setters
+    public void setHovered(boolean hovered) {
+        this.hovered = hovered;
+    }
 
-	public void setColorNotHovered(Color colorNotHovered) {
-		this.colorNotHovered = colorNotHovered;
-	}
+    public String getText() {
+        return text;
+    }
 
-	public Color getColorHovered() {
-		return colorHovered;
-	}
+    public void setText(String text) {
+        this.text = text;
+        createBoundings();
+    }
 
-	public void setColorHovered(Color colorHovered) {
-		this.colorHovered = colorHovered;
-	}
+    public String getCommand() {
+        return command;
+    }
 
-	public MainMenuButton getAlignButton() {
-		return alignButton;
-	}
+    public void setCommand(String command) {
+        this.command = command;
+    }
 
-	public void setAlignButton(MainMenuButton alignButton) {
-		this.alignButton = alignButton;
-		createBoundings();
-	}
+    public float getxOffset() {
+        return xOffset;
+    }
 
-	public Rectangle getBounds() {
-		return bounds;
-	}	
+    public void setxOffset(float xOffset) {
+        this.xOffset = xOffset;
+        createBoundings();
+    }
+
+    public float getyOffset() {
+        return yOffset;
+    }
+
+    public void setyOffset(float yOffset) {
+        this.yOffset = yOffset;
+        createBoundings();
+    }
+
+    public Font getFont() {
+        return font;
+    }
+
+    public void setFont(Font font) {
+        this.font = font;
+        createBoundings();
+    }
+
+    public Color getColorNotHovered() {
+        return colorNotHovered;
+    }
+
+    public void setColorNotHovered(Color colorNotHovered) {
+        this.colorNotHovered = colorNotHovered;
+    }
+
+    public Color getColorHovered() {
+        return colorHovered;
+    }
+
+    public void setColorHovered(Color colorHovered) {
+        this.colorHovered = colorHovered;
+    }
+
+    public MainMenuButton getAlignButton() {
+        return alignButton;
+    }
+
+    public void setAlignButton(MainMenuButton alignButton) {
+        this.alignButton = alignButton;
+        createBoundings();
+    }
+
+    public Rectangle getBounds() {
+        return bounds;
+    }
 }

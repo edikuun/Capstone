@@ -27,7 +27,7 @@ public class Player implements KeyListener {
             ownScaling = 1f;
     private float x, y, platformXOffset;
     private int jumpCounter, jumpAt = 1;
-    private Image spriteStanding, spriteSitting, spriteJumpingRight, spriteJumpingLeft, spriteDead;
+    private Image spriteRightB, spriteLeftB, spriteStanding, spriteSitting, spriteJumpingRight, spriteJumpingLeft, spriteDead, spriteStandLeft;
     private boolean useOwnScaling = false, onPlatform = false, sitting = false, alive = false;
     private Platform platform;
     private Image currentSprite;
@@ -40,7 +40,10 @@ public class Player implements KeyListener {
     private boolean pressedLeft = false;
     private boolean pressedRight = false;
     private boolean pressedJump = false;
-
+    private boolean faceLeft = false;
+    private boolean faceRight = true;
+    
+    
     public void init(GameContainer container, StateBasedGame game, InGameState state) {
         container.getInput().addKeyListener(this);
         gameState = state;
@@ -51,14 +54,19 @@ public class Player implements KeyListener {
         SpriteSheet haramjumpright = SpritesheetLoader.getInstance().getSpriteSheet("haramboyJumpRight", 64, 64);
         SpriteSheet haramjumpleft = SpritesheetLoader.getInstance().getSpriteSheet("haramboyJumpLeft", 64, 64);
         SpriteSheet dead = SpritesheetLoader.getInstance().getSpriteSheet("dead", 75, 75);
+        SpriteSheet leftbounds = SpritesheetLoader.getInstance().getSpriteSheet("leftJumpBounds", 26, 50);
+        SpriteSheet rightbounds = SpritesheetLoader.getInstance().getSpriteSheet("rightJumpBounds", 26, 50);
         spriteStanding = haramjumpright.getSprite(0, 0).getSubImage(0, 0, 60, 50);
+        spriteStandLeft = haramjumpleft.getSprite(0,0).getSubImage(0, 0, 60, 50);
         spriteJumpingRight = haramjumpright.getSprite(1, 0).getSubImage(0, 0, 64, 50);
         spriteJumpingLeft = haramjumpleft.getSprite(1, 0).getSubImage(0, 0, 64, 50);
         spriteSitting = haramstand.getSprite(0, 0).getSubImage(0, 0, 53, 73);
+        spriteLeftB = leftbounds.getSprite(0,0).getSubImage(0, 0, 26, 50);
+        spriteRightB = rightbounds.getSprite(0,0).getSubImage(0, 0, 26, 50);
         spriteDead = dead.getSprite(0, 0).getSubImage(0, 0, 75, 75);
 
         currentSprite = spriteStanding;
-        bounds = new Rectangle(0, 0, spriteStanding.getWidth() * gameState.getTextureScaling(), spriteStanding.getHeight() * gameState.getTextureScaling());
+        bounds = new Rectangle(0, 0, spriteLeftB.getWidth() * gameState.getTextureScaling(), spriteStanding.getHeight() * gameState.getTextureScaling());
     }
 
     public void update(GameContainer container, StateBasedGame game, int delta) {
@@ -66,10 +74,14 @@ public class Player implements KeyListener {
             if (pressedLeft) {
                 setCurrentSprite(spriteJumpingLeft);
                 pressedLeft = false;
+                faceRight = false;
+                faceLeft = true;
             }
             if (pressedRight) {
                 setCurrentSprite(spriteJumpingRight);
                 pressedRight = false;
+                faceLeft = false;
+                faceRight = true;
             }
         }
 
@@ -78,11 +90,23 @@ public class Player implements KeyListener {
         if (!onPlatform) {
             y += ySpeed;
             applyGravity();
+            if (pressedLeft) {
+                setCurrentSprite(spriteJumpingLeft);
+                pressedLeft = false;
+                faceRight = false;
+                faceLeft = true;
+            }
+            if (pressedRight) {
+                setCurrentSprite(spriteJumpingRight);
+                pressedRight = false;
+                faceLeft = false;
+                faceRight = true;
+            }
             if (alive) {
-                if (x <= 3) {
-                    x = 3;
-                } else if (x >= container.getWidth() - 120) {
-                    x = container.getWidth() - 120;
+                if (x <= 0) {
+                    x = 0;
+                } else if (x >= container.getWidth() - getBounds().getWidth()) {
+                    x = container.getWidth() - getBounds().getWidth();
                 }
                 x += xSpeed;
 
@@ -95,7 +119,7 @@ public class Player implements KeyListener {
             }
         } else if (onPlatform && alive) {
             checkPlatformChanges();
-
+            
             if (!sitting && !container.getInput().isKeyDown(Input.KEY_LCONTROL)) {
 
                 if (jumpCounter >= jumpAt) {
@@ -164,13 +188,17 @@ public class Player implements KeyListener {
         Rectangle myBounds = gameState.calcRenderRect(getBounds());
         myBounds.setY(myBounds.getY() + myBounds.getHeight() * 0.9f);
         myBounds.setHeight(myBounds.getHeight() * 0.1f);
+        myBounds.setX(myBounds.getX());
 
         for (Platform p : platforms) {
             if (p.applyPlayerCollision() && myBounds.intersects(p.getReCalculatedHitBounds(gameState)) && ySpeed < 0) {
                 ySpeed = 0;
                 onPlatform = true;
                 y = p.getHitBounds().getY() + getBounds().getHeight();
+                if(faceRight)
                 setCurrentSprite(sitting ? spriteSitting : spriteStanding);
+                else if(faceLeft)
+                setCurrentSprite(sitting ? spriteSitting : spriteStandLeft);     
                 p.onHit(this);
                 platform = p;
                 platformXOffset = calculateXOffset(platform);
@@ -209,8 +237,8 @@ public class Player implements KeyListener {
     public Rectangle getBounds() {
         bounds.setX(x);
         bounds.setY(y);
-        bounds.setWidth(spriteStanding.getWidth() * gameState.getTextureScaling());
-        bounds.setHeight(spriteStanding.getHeight() * gameState.getTextureScaling());
+        bounds.setWidth((spriteRightB.getWidth()) * gameState.getTextureScaling());
+        bounds.setHeight((spriteStanding.getHeight() - 6) * gameState.getTextureScaling());
         return bounds;
 
     }
@@ -261,7 +289,10 @@ public class Player implements KeyListener {
             pressedLeft = true;
             xSpeed = -constantXSpeed;
         } else if (Input.KEY_SPACE == key && onPlatform) {
-            setCurrentSprite(spriteStanding);
+            if(faceRight)
+            setCurrentSprite(spriteJumpingRight);
+            else if(faceLeft)
+            setCurrentSprite(spriteJumpingLeft);
             jumpCounter++;
             ySpeed = maxSpeed;
         } else if (onPlatform) {

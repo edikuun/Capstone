@@ -56,6 +56,7 @@ public class InGameState extends BasicGameState {
     private Audio music;
     private Music music2;
     private Sound music3;
+    private int x = 0, y = -2672;
 
     private LinkedList<Integer[]> placesInDebugToClear = new LinkedList<Integer[]>();
 
@@ -73,8 +74,8 @@ public class InGameState extends BasicGameState {
         Image image = new Image((int) textureScaling, (int) textureScaling);
         Graphics g = image.getGraphics();
         Graphics.setCurrent(g);
-        bg = ImageLoader.getInstance().getImage("spritesheet_bg");
-        g.drawImage(bg, 0, 0);
+        bg = ImageLoader.getInstance().getImage("spritesheet_bg5");
+        g.drawImage(bg, x, y);
         try {
             music = AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("Images\\39 - Best Day of My Life - American Authors.ogg"));
         } catch (IOException e) {
@@ -92,7 +93,7 @@ public class InGameState extends BasicGameState {
     public void render(GameContainer container, StateBasedGame game, Graphics g)
             throws SlickException {
         if (player.isAlive()) {
-            g.drawImage(bg, 0, 0);
+            g.drawImage(bg, x, y);
         }
         for (int i = platforms.size() - 1; i >= 0; i--) {
             if (gameScreenBoundings.getHeight() - platforms.get(i).getHitBounds().getY() + cameraHeight > gameScreenBoundings.getHeight() + 2) {
@@ -122,6 +123,8 @@ public class InGameState extends BasicGameState {
             throws SlickException {
         system.update(delta);
         
+        
+        //if()
 
         for (Platform p : platformsToRemove) {
             platforms.remove(p);
@@ -168,6 +171,10 @@ public class InGameState extends BasicGameState {
                 Rectangle renderBounds = this.calcRenderRect(pBounds);
                 if (renderBounds.getY() < gameScreenBoundings.getHeight() * 0.2f) {
                     scrollSpeed = constantScrollSpeed;
+                    y += constantScrollSpeed;
+                    if(y == 0){
+                        y = -1336;
+                    }
                 } else {
                     scrollSpeed = 0;
                 }
