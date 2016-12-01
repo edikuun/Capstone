@@ -13,7 +13,7 @@
 
 ## Download Link
 
-   Click [this](https://drive.google.com/open?id=0B0b8tXysvCHDdVJTTTdxYU5qZE0) for the download link of the JAR
+   Click [this](https://drive.google.com/open?id=0B0b8tXysvCHDazk5TkVxZGtNbEE) for the download link of the JAR
    
    Extract the files from the rar file and click the JAR to play the game
 
