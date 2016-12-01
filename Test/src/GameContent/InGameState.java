@@ -32,11 +32,13 @@ import ImageLoaders.SpritesheetLoader;
 import Transitions.FixedAlphaFadingTransition;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.Sound;
+import java.util.*;
 
 public class InGameState extends BasicGameState {
 
     public static final int ID = 1;
 
+    private boolean check = false;
     private Rectangle gameScreenBoundings;
     private float textureScaling = 2f, cameraHeight = 0f;
     private LinkedList<Platform> platforms = new LinkedList<Platform>();
@@ -44,7 +46,7 @@ public class InGameState extends BasicGameState {
     private SpriteSheet sheet;
     private Player player = new Player();
     private int score;
-    private float scrollSpeed, constantScrollSpeed = 7.5f;
+    private float scrollSpeed, constantScrollSpeed = 7.5f, fallSpeed = 3.5f;
     private int applyCounter, applyMax = 15;
     private Font font;
     private float scoreFactor = 0.003f;
@@ -52,11 +54,21 @@ public class InGameState extends BasicGameState {
     private List<Platform> platformsToRemove = new LinkedList<Platform>();
     private LinkedList<Sprite> sprites = new LinkedList<Sprite>();
     private MainGame game;
+    SpriteSheet hurtR = SpritesheetLoader.getInstance().getSpriteSheet("haramboyHurt", 46, 54);
+    SpriteSheet hurtL = SpritesheetLoader.getInstance().getSpriteSheet("haramboyHurt2", 46, 54);
     private Image bg;
+    private Image hurt = hurtR.getSprite(0, 0).getSubImage(0, 0, 46, 54);
+    private Image hurt2 = hurtL.getSprite(0, 0).getSubImage(0, 0, 46, 54);
     private Audio music;
-    private Music music2;
-    private Sound music3;
+    private Image hp;
+    private Sound hitSound;
+    private Sound jumpSound;
     private int x = 0, y = -2672;
+    private Rectangle bounds;
+    private List<FallingObject> bananas;
+    private int z = 0;
+    private int spawner = 200;
+    private Lava lava;
 
     private LinkedList<Integer[]> placesInDebugToClear = new LinkedList<Integer[]>();
 
@@ -68,7 +80,8 @@ public class InGameState extends BasicGameState {
         gameScreenBoundings = new Rectangle(0, 0, container.getWidth(), container.getHeight());
         sheet = SpritesheetLoader.getInstance().getSpriteSheet("normal", 62, 15);
         font = new TrueTypeFont(new java.awt.Font("consola", java.awt.Font.BOLD, 20), true);
-        player.init(container, game, this);
+        lava = new Lava(container, this);
+        player.init(container, game, this, lava);
         generator = new Generator(this);
         this.game = (MainGame) game;
         Image image = new Image((int) textureScaling, (int) textureScaling);
@@ -76,13 +89,14 @@ public class InGameState extends BasicGameState {
         Graphics.setCurrent(g);
         bg = ImageLoader.getInstance().getImage("spritesheet_bg5");
         g.drawImage(bg, x, y);
-        try {
-            music = AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("Images\\39 - Best Day of My Life - American Authors.ogg"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        music2 = new Music("Images\\39 - Best Day of My Life - American Authors.ogg");
-        music3 = new Sound("Images\\39 - Best Day of My Life - American Authors.ogg");
+        hp = ImageLoader.getInstance().getImage("spritesheet_maxhp");
+        g.drawImage(hp, 0, 0);
+        bananas = new ArrayList<FallingObject>();
+
+        z = 0;
+
+        //hitSound = new Sound("Images\\getHit.ogg");
+        //jumpSound = new Sound("Images\\JUMP.ogg");
         g.fillRect(0, 0, image.getWidth(), image.getHeight());
         g.flush();
         system = new ParticleSystem(image);
@@ -94,7 +108,9 @@ public class InGameState extends BasicGameState {
             throws SlickException {
         if (player.isAlive()) {
             g.drawImage(bg, x, y);
+
         }
+
         for (int i = platforms.size() - 1; i >= 0; i--) {
             if (gameScreenBoundings.getHeight() - platforms.get(i).getHitBounds().getY() + cameraHeight > gameScreenBoundings.getHeight() + 2) {
                 break;
@@ -115,6 +131,16 @@ public class InGameState extends BasicGameState {
             String pointString = "Score: " + player.getScore();
             font.drawString(gameScreenBoundings.getMaxX() - font.getWidth(pointString), 0, pointString);
         }
+        if (player.isAlive()) {
+            g.drawImage(hp, 0, 0);
+
+        }
+        for (FallingObject banana : bananas) {
+            banana.draw(banana.getX(), banana.getY());
+            //banana.draw2();
+        }
+        lava.move.draw(lava.getX(), lava.getY());
+        //lava.draw2();
         system.render();
     }
 
@@ -122,9 +148,6 @@ public class InGameState extends BasicGameState {
     public void update(GameContainer container, StateBasedGame game, int delta)
             throws SlickException {
         system.update(delta);
-        
-        
-        //if()
 
         for (Platform p : platformsToRemove) {
             platforms.remove(p);
@@ -167,12 +190,52 @@ public class InGameState extends BasicGameState {
                 return;
             }
             if (player.isAlive()) {
-                Rectangle pBounds = player.getBounds();
-                Rectangle renderBounds = this.calcRenderRect(pBounds);
+                Rectangle pBounds = calcRenderRect(player.getBounds());
+                Rectangle renderBounds = this.calcRenderRect(player.getBounds());
+                for (Iterator<FallingObject> iterator = bananas.iterator(); iterator.hasNext();) {
+                    FallingObject banana = iterator.next();
+                    float s = 0f;
+                    if (player.getY() > 0 && renderBounds.getY() < gameScreenBoundings.getHeight() * 0.2f) {
+                        s = banana.y + (constantScrollSpeed * 2);
+                    } else if (player.getY() > 0) {
+                        s = banana.y + (fallSpeed);
+                    }
+                    if (player.getYSpeed() == 0) {
+                        s = banana.y + (fallSpeed);
+                    }
+                    banana.y = s;
+                    if (banana.y >= container.getHeight()) {
+                        iterator.remove();
+                    }
+                    if (banana.getBounds().intersects(pBounds)) {
+                        player.hp--;
+                        if (player.isFaceRight()) {
+                            player.setCurrentSprite(hurt);
+                        } else if (player.isFaceLeft()) {
+                            player.setCurrentSprite(hurt2);
+                        }
+                        iterator.remove();
+                    }
+
+                }
+                if (player.getHp() == 2) {
+                    hp = ImageLoader.getInstance().getImage("spritesheet_2hp");
+                } else if (player.getHp() == 1) {
+                    hp = ImageLoader.getInstance().getImage("spritesheet_mask");
+                }
+                if (player.getYSpeed() == 0 || player.getFalling() || renderBounds.getY() > gameScreenBoundings.getHeight() * 0.2f) {
+                    lava.setY(lava.getY() - 0.5f);
+                } else if (player.getY() > 0 && !player.getFalling() && lava.getY() < (container.getHeight() - (lava.l.getHeight() - 638))) {
+                    lava.setY(lava.getY() + 1);
+                }
+                if (pBounds.intersects(lava.getBounds())) {
+                    player.checkDeath();
+                    player.setCheck(true);
+                }
                 if (renderBounds.getY() < gameScreenBoundings.getHeight() * 0.2f) {
                     scrollSpeed = constantScrollSpeed;
                     y += constantScrollSpeed;
-                    if(y == 0){
+                    if (y == 0) {
                         y = -1336;
                     }
                 } else {
@@ -182,16 +245,31 @@ public class InGameState extends BasicGameState {
                 for (Platform p : platforms) {
                     p.adjustY(scrollSpeed);
                 }
+
             }
             player.update(container, game, delta);
+
+            z += delta;
+            if (z >= spawner && player.getScore() >= 10 && player.isAlive()) {
+                addBanana(container);
+            }
         }
     }
 
     public void initNewGame() {
         cameraHeight = 0f;
+        z = 0;
         platforms.clear();
+        platforms = new LinkedList<Platform>();
+        bananas = new ArrayList<FallingObject>();
         player.setScore(0);
         player.setCurrentSprite(player.getSpriteNew());
+        player.hp = 3;
+        generator = new Generator(this);
+        lava.reset();
+
+        y = -2672;
+        hp = ImageLoader.getInstance().getImage("spritesheet_maxhp");
 
         Image base = sheet.getSprite(0, 0).getSubImage(0, 0, 62, 15);
         Image flipped = base.getFlippedCopy(true, false);
@@ -294,9 +372,8 @@ public class InGameState extends BasicGameState {
     public void enter(GameContainer container, StateBasedGame game) throws SlickException {
         placesInDebugToClear.clear();
         DebugInfo info = this.game.getDebugInfo();
-        music2.play();
 
-       /* try {
+        /* try {
             Integer[] coordsForPlatCount = info.getFirstFree();
             info.set(coordsForPlatCount[0], coordsForPlatCount[1], new Object[]{"Platform: ", new Object[]{InGameState.class.getMethod("getPlatformCount"), this}});
 
@@ -337,5 +414,20 @@ public class InGameState extends BasicGameState {
 
     public LinkedList<Sprite> getSprites() {
         return sprites;
+    }
+
+    public void addBanana(GameContainer container) {
+        check = true;
+        FallingObject saging = new FallingObject(container, this);
+        for (FallingObject banana : bananas) {
+            if (saging.getBounds().intersects(banana.getBounds())) {
+                check = false;
+                break;
+            }
+        }
+        if (check) {
+            bananas.add(saging);
+        }
+        z = 0;
     }
 }

@@ -40,6 +40,7 @@ public class MainMenu extends BasicGameState {
     private SpriteSheet sheet;
     private Image bg, title;
     private int frameWidth = 59, frameHeight = 19;
+    private Animation newTitle;
 
     private ParticleSystem system;
     //private OneTimeEmitter emitter;
@@ -49,7 +50,23 @@ public class MainMenu extends BasicGameState {
             throws SlickException {
         sheet = SpritesheetLoader.getInstance().getSpriteSheet("move", frameWidth, frameHeight);
         bg = ImageLoader.getInstance().getImage("spritesheet_bg");
-        title = ImageLoader.getInstance().getImage("title");
+        //title = ImageLoader.getInstance().getImage("title");
+
+        Image f2 = ImageLoader.getInstance().getImage("f2");
+        Image f3 = ImageLoader.getInstance().getImage("f3");
+        Image f4 = ImageLoader.getInstance().getImage("f4");
+        Image f5 = ImageLoader.getInstance().getImage("f5");
+        Image f6 = ImageLoader.getInstance().getImage("f6");
+        Image f7 = ImageLoader.getInstance().getImage("f7");
+        Image f8 = ImageLoader.getInstance().getImage("f8");
+        Image f9 = ImageLoader.getInstance().getImage("f9");
+        Image f10 = ImageLoader.getInstance().getImage("f10");
+        Image f11 = ImageLoader.getInstance().getImage("f11");
+
+        Image[] frames = {f2, f3, f4, f5, f6, f7, f8, f9, f10, f11};
+
+        newTitle = new Animation(frames, new int[]{500, 500, 500, 500, 500, 500, 500, 500, 500, 1000});
+        newTitle.setLooping(true);
 
         this.game = game;
         this.container = container;
@@ -57,8 +74,6 @@ public class MainMenu extends BasicGameState {
 
         system = new ParticleSystem(sheet.getSprite(0, 0));
         system.setUsePoints(true);
-
-       
 
         buttons.add(new MainMenuButton(this, "START", CMD_NEW_GAME, container.getWidth() / 2, container.getHeight() * 0.1f, container));
         buttons.add(new MainMenuButton(this, "HIGH SCORE", CMD_HIGHSCORE, buttons.get(0), 0, 5, container));
@@ -71,7 +86,8 @@ public class MainMenu extends BasicGameState {
             throws SlickException {
         system.render();
         g.drawImage(bg, 0, 0);
-        g.drawImage(title, 0, 0);
+        //g.drawImage(title, 0, 0);
+        newTitle.draw(container.getWidth() / 2 - 250, container.getHeight() / 2 - 300, 600, 600);
         for (MainMenuButton btn : buttons) {
             btn.render(container, game, g);
         }

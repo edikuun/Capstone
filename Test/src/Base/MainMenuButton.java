@@ -122,11 +122,10 @@ public class MainMenuButton implements MouseListener {
     @Override
     public void mouseMoved(int oldx, int oldy, int newx, int newy) {
         if (bounds.contains(newx, newy)) {
-            setHovered(true);
+            setHover(true);
         } else {
-            setHovered(false);
+            setHover(false);
         }
-
     }
 
     @Override
@@ -148,10 +147,6 @@ public class MainMenuButton implements MouseListener {
     }
 
     //Getters and Setters
-    public void setHovered(boolean hovered) {
-        this.hovered = hovered;
-    }
-
     public String getText() {
         return text;
     }
@@ -223,5 +218,9 @@ public class MainMenuButton implements MouseListener {
 
     public Rectangle getBounds() {
         return bounds;
+    }
+
+    public void setHover(boolean hover) {
+        this.hovered = hover;
     }
 }
