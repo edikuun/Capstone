@@ -1,4 +1,4 @@
-# Harambe's Dream
+![alt text](https://github.com/edikuun/Capstone/blob/master/Test/Images/f11.png "Harambe's Dream")
 ## Background of the Game
 ## Game Mechanics
 
