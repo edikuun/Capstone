@@ -19,6 +19,6 @@ Aram was an orphan, he was abused all the time in the orphanage. Other kids woul
 
 # Download Link
 
-   Click [this](https://drive.google.com/open?id=0B0b8tXysvCHDazk5TkVxZGtNbEE) for the download link of the JAR
+   Click [this](https://drive.google.com/open?id=0B0b8tXysvCHDc2lqY0RsSW9DTE0) for the download link of the JAR
    
    Extract the files from the rar file and click the JAR to play the game
